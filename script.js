@@ -88,31 +88,45 @@
     mascot: '🐻',
     current: null,
     locked: false,
+    bag: [],
+    lastQuestionKey: null,
   };
 
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-  function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-
-  function generateQuestion(mode) {
-    let op = mode;
-    if (mode === 'mix') op = Math.random() < 0.5 ? 'add' : 'sub';
-
-    let a, b, answer;
-    if (op === 'add') {
-      a = pick(NUMS);
-      b = pick(NUMS);
-      answer = a + b;
-    } else {
-      a = pick(NUMS);
-      b = pick(NUMS);
-      if (b > a) [a, b] = [b, a];
-      answer = a - b;
+  // Every distinct problem for a mode, so a round draws from a shuffled
+  // "bag" instead of random.random() — no repeats until all are seen.
+  function buildPool(mode) {
+    const pool = [];
+    if (mode === 'add' || mode === 'mix') {
+      NUMS.forEach(a => NUMS.forEach(b => {
+        pool.push({ a, b, op: 'add', symbol: '+', answer: a + b });
+      }));
     }
+    if (mode === 'sub' || mode === 'mix') {
+      NUMS.forEach(a => NUMS.forEach(b => {
+        if (a >= b) pool.push({ a, b, op: 'sub', symbol: '−', answer: a - b });
+      }));
+    }
+    return pool;
+  }
 
-    const symbol = op === 'add' ? '+' : '−';
-    const choices = buildChoices(answer);
-    return { a, b, op, symbol, answer, choices };
+  function questionKey(q) { return `${q.op}:${q.a}:${q.b}`; }
+
+  function refillBag(mode) {
+    const pool = shuffle(buildPool(mode));
+    // avoid the reshuffled bag starting with the question that just ended the last one
+    if (state.lastQuestionKey && pool.length > 1 && questionKey(pool[0]) === state.lastQuestionKey) {
+      [pool[0], pool[1]] = [pool[1], pool[0]];
+    }
+    state.bag = pool;
+  }
+
+  function drawQuestion(mode) {
+    if (state.bag.length === 0) refillBag(mode);
+    const template = state.bag.shift();
+    state.lastQuestionKey = questionKey(template);
+    return { ...template, choices: buildChoices(template.answer) };
   }
 
   function buildChoices(answer) {
@@ -203,6 +217,8 @@
     state.round = 0;
     state.stars = 0;
     state.streak = 0;
+    state.bag = [];
+    state.lastQuestionKey = null;
     starCount.textContent = '0';
     progressFill.style.width = '0%';
     streakBadge.hidden = true;
@@ -221,7 +237,7 @@
     feedbackEl.className = 'feedback';
     progressFill.style.width = ((state.round - 1) / ROUND_LENGTH) * 100 + '%';
 
-    const q = generateQuestion(state.mode);
+    const q = drawQuestion(state.mode);
     state.current = q;
 
     cardQuestion.textContent = `${q.a} ${q.symbol} ${q.b} = ?`;
