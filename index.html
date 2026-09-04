@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Math Cards! 🐻</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐻</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="clouds" aria-hidden="true">
+  <div class="cloud c1">☁️</div>
+  <div class="cloud c2">☁️</div>
+  <div class="cloud c3">☁️</div>
+</div>
+
+<button id="soundToggle" class="icon-btn" aria-label="Toggle sound" title="Sound on/off">🔊</button>
+
+<main id="app">
+
+  <!-- START SCREEN -->
+  <section id="screen-start" class="screen active">
+    <h1 class="title">Math Cards <span class="wiggle">🐻</span></h1>
+    <p class="subtitle">Let's count with 1, 2 &amp; 5!</p>
+
+    <div class="mascot-wrap">
+      <div id="mascot" class="mascot">🐻</div>
+      <div class="speech-bubble" id="startBubble">Hi friend! Ready to play?</div>
+    </div>
+
+    <div class="mode-picker">
+      <p class="picker-label">What should we practice?</p>
+      <div class="mode-buttons">
+        <button class="mode-btn" data-mode="add">➕<br>Adding</button>
+        <button class="mode-btn" data-mode="sub">➖<br>Taking Away</button>
+        <button class="mode-btn selected" data-mode="mix">🎲<br>Mix It Up!</button>
+      </div>
+    </div>
+
+    <button id="startBtn" class="big-btn start-btn">Let's Play! 🚀</button>
+  </section>
+
+  <!-- GAME SCREEN -->
+  <section id="screen-game" class="screen">
+    <div class="hud">
+      <div class="stars">
+        <span class="star-icon">⭐</span>
+        <span id="starCount">0</span>
+      </div>
+      <div class="progress-track">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+      <div class="streak" id="streakBadge" hidden>🔥 <span id="streakCount">0</span></div>
+    </div>
+
+    <div class="mascot-wrap small">
+      <div id="mascotGame" class="mascot">🐻</div>
+    </div>
+
+    <div class="card-stage">
+      <div id="card" class="flashcard">
+        <div id="cardQuestion" class="card-question">2 + 1 = ?</div>
+      </div>
+    </div>
+
+    <div id="answers" class="answers"></div>
+
+    <div id="feedback" class="feedback" aria-live="polite"></div>
+  </section>
+
+  <!-- RESULTS SCREEN -->
+  <section id="screen-results" class="screen">
+    <h1 class="title">Amazing Job! <span class="wiggle">🎉</span></h1>
+    <div class="mascot-wrap">
+      <div class="mascot big-mascot">🐻🎉</div>
+    </div>
+    <p class="result-stars">⭐ You earned <span id="finalStars">0</span> stars! ⭐</p>
+    <p class="result-sub" id="resultMessage">You're a math superstar!</p>
+    <button id="againBtn" class="big-btn start-btn">Play Again! 🔄</button>
+  </section>
+
+</main>
+
+<div id="confetti-root" aria-hidden="true"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
