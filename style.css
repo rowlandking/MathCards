@@ -87,6 +87,7 @@ body {
   margin: 6px 0 0;
   color: var(--ink);
   text-shadow: 2px 2px 0 #fff;
+  text-wrap: balance;
 }
 .subtitle {
   font-size: 1.2rem;
@@ -166,6 +167,42 @@ body {
   color: #7a6a94;
   margin: 10px 0 8px;
 }
+.picker-hint {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: #a598bd;
+}
+
+.number-picker { margin-bottom: 6px; }
+.number-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 380px;
+  margin: 0 auto 18px;
+}
+.number-chip {
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #f0e6ff;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #e5d9f5;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s;
+  font-variant-numeric: tabular-nums;
+}
+.number-chip:active { transform: translateY(3px); box-shadow: 0 1px 0 #e5d9f5; }
+.number-chip.selected {
+  background: linear-gradient(160deg, var(--blue), #4fb6ff);
+  border-color: #fff;
+  color: #0b3a57;
+}
 
 .mode-buttons {
   display: flex;
@@ -196,6 +233,7 @@ body {
 }
 .mode-btn:focus-visible,
 .option-toggle:focus-visible,
+.number-chip:focus-visible,
 .big-btn:focus-visible,
 .answer-btn:focus-visible,
 .icon-btn:focus-visible {
@@ -203,11 +241,18 @@ body {
   outline-offset: 3px;
 }
 
+.options-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
 .option-toggle {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 auto 20px;
   max-width: 320px;
   background: #fff;
   border: 3px solid #f0e6ff;
@@ -284,6 +329,7 @@ body {
   padding: 6px 14px;
   box-shadow: 0 3px 0 #f0dca0;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .progress-track {
   flex: 1;
@@ -347,6 +393,7 @@ body {
   font-weight: 800;
   color: var(--ink);
   letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
 }
 
 .answers {
@@ -367,6 +414,7 @@ body {
   cursor: pointer;
   box-shadow: 0 6px 0 #d9cdf0, 0 8px 14px rgba(0,0,0,0.08);
   transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s;
+  font-variant-numeric: tabular-nums;
 }
 .answer-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #d9cdf0; }
 .answer-btn.correct {
@@ -391,12 +439,68 @@ body {
 .result-stars {
   font-size: 1.5rem;
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 .result-sub {
   font-size: 1.15rem;
   color: #7a6a94;
   font-weight: 700;
   margin-bottom: 20px;
+}
+
+/* Wiggle break */
+.wiggle-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(74, 58, 99, 0.55);
+  padding: 20px;
+  animation: fadeIn 0.25s ease;
+}
+.wiggle-overlay[hidden] { display: none; }
+.wiggle-card {
+  background: var(--card-bg);
+  border: 6px solid #fff;
+  border-radius: 28px;
+  padding: 32px 28px;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 16px 0 #e9dcc8, 0 20px 30px rgba(0,0,0,0.25);
+  animation: bounceIn 0.5s ease;
+}
+.wiggle-icon {
+  font-size: 4.5rem;
+  animation: tumble 1s ease-in-out infinite;
+}
+.wiggle-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 10px 0 20px;
+  text-wrap: balance;
+}
+.wiggle-done-btn {
+  font-size: 1.2rem;
+  padding: 12px 28px;
+  background: linear-gradient(160deg, var(--green), #4cc172);
+  box-shadow: 0 6px 0 #2f9a52, 0 10px 18px rgba(76, 193, 114, 0.35);
+}
+.wiggle-done-btn:active {
+  box-shadow: 0 1px 0 #2f9a52, 0 4px 10px rgba(76, 193, 114, 0.35);
+}
+@keyframes bounceIn {
+  0% { transform: scale(0.6) rotate(-6deg); opacity: 0; }
+  60% { transform: scale(1.08) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes tumble {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-15deg) translateY(-4px); }
+  50% { transform: rotate(0deg) translateY(0); }
+  75% { transform: rotate(15deg) translateY(-4px); }
 }
 
 /* Confetti */
@@ -422,4 +526,12 @@ body {
   .card-question { font-size: 2.3rem; }
   .answer-btn { font-size: 1.6rem; padding: 14px 0; }
   .mascot { font-size: 4.2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud, .wiggle, .mascot, .mode-btn, .streak, .flashcard.pop-in, .flashcard.shake,
+  .answer-btn.correct, .mascot.happy, .mascot.oops, .confetti-piece,
+  .wiggle-card, .wiggle-icon, .wiggle-overlay {
+    animation: none !important;
+  }
 }
