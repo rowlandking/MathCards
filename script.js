@@ -82,6 +82,7 @@
   // ---------- Game state ----------
   const state = {
     mode: 'mix',
+    retryOnWrong: false,
     round: 0,
     stars: 0,
     streak: 0,
@@ -161,6 +162,7 @@
   const mascotStart = document.getElementById('mascot');
   const mascotGame = document.getElementById('mascotGame');
   const modeButtons = document.querySelectorAll('.mode-btn');
+  const retryToggle = document.getElementById('retryToggle');
   const startBtn = document.getElementById('startBtn');
   const againBtn = document.getElementById('againBtn');
   const starCount = document.getElementById('starCount');
@@ -192,6 +194,13 @@
       btn.classList.add('selected');
       state.mode = btn.dataset.mode;
     });
+  });
+
+  retryToggle.addEventListener('click', () => {
+    Sound.click();
+    state.retryOnWrong = !state.retryOnWrong;
+    retryToggle.classList.toggle('on', state.retryOnWrong);
+    retryToggle.setAttribute('aria-pressed', String(state.retryOnWrong));
   });
 
   soundToggle.addEventListener('click', () => {
@@ -256,13 +265,13 @@
   }
 
   function onAnswer(choice, btn) {
-    if (state.locked) return;
-    state.locked = true;
+    if (state.locked || btn.disabled) return;
     const correct = choice === state.current.answer;
     const allBtns = answersEl.querySelectorAll('.answer-btn');
-    allBtns.forEach(b => b.disabled = true);
 
     if (correct) {
+      state.locked = true;
+      allBtns.forEach(b => b.disabled = true);
       btn.classList.add('correct');
       state.stars += 1;
       state.streak += 1;
@@ -282,28 +291,40 @@
       }
       progressFill.style.width = (state.round / ROUND_LENGTH) * 100 + '%';
       setTimeout(nextQuestion, 1100);
-    } else {
-      btn.classList.add('wrong');
-      state.streak = 0;
-      streakBadge.hidden = true;
-      feedbackEl.textContent = pick(TRY_AGAIN_LINES);
-      feedbackEl.className = 'feedback wrong-text';
-      mascotGame.classList.remove('happy');
-      void mascotGame.offsetWidth;
-      mascotGame.classList.add('oops');
-      card.classList.add('shake');
-      Sound.wrong();
-
-      // reveal correct answer gently, then move on
-      setTimeout(() => {
-        allBtns.forEach(b => {
-          if (Number(b.textContent) === state.current.answer) {
-            b.classList.add('correct');
-          }
-        });
-      }, 500);
-      setTimeout(nextQuestion, 1600);
+      return;
     }
+
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    state.streak = 0;
+    streakBadge.hidden = true;
+    feedbackEl.className = 'feedback wrong-text';
+    mascotGame.classList.remove('happy', 'oops');
+    card.classList.remove('shake');
+    void mascotGame.offsetWidth;
+    mascotGame.classList.add('oops');
+    card.classList.add('shake');
+    Sound.wrong();
+
+    if (state.retryOnWrong) {
+      // leave the other buttons live so the child can pick again — no reveal, no auto-advance
+      feedbackEl.textContent = pick(TRY_AGAIN_LINES) + ' Try another one!';
+      return;
+    }
+
+    state.locked = true;
+    allBtns.forEach(b => b.disabled = true);
+    feedbackEl.textContent = pick(TRY_AGAIN_LINES);
+
+    // reveal correct answer gently, then move on
+    setTimeout(() => {
+      allBtns.forEach(b => {
+        if (Number(b.textContent) === state.current.answer) {
+          b.classList.add('correct');
+        }
+      });
+    }, 500);
+    setTimeout(nextQuestion, 1600);
   }
 
   function finishRound() {
